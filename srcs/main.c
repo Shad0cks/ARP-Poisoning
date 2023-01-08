@@ -4,9 +4,13 @@ int wait_for_arp_req(int socketfd, struct ft_malcolm * malcolm)
 {
     unsigned char		buffer[sizeof(struct ethhdr) + sizeof(struct arp_header)];
     struct arp_header * arp_req = (struct arp_header *)(buffer + sizeof(struct ethhdr));
-    //struct ethhdr * infos_req = (struct ethhdr *)(buffer);
+
+    if (malcolm->verbose)
+    {
+        printf("Waiting for ARP request form ");
+        print_ipv4(malcolm->target_ip);
+    }
 	ft_memset(buffer, 0, sizeof(struct ethhdr) + sizeof(struct arp_header));
-    
     while (ft_memcmp(arp_req->sender_mac, malcolm->target_mac, MAC_LENGTH) != 0 && ft_memcmp(arp_req->sender_ip, malcolm->target_ip, IPV4_LENGTH) != 0)
     {
         ft_memset(buffer, 0, sizeof(struct ethhdr) + sizeof(struct arp_header));
@@ -185,11 +189,14 @@ int main(int argc, char** argv)
         return (1);
     }
 
-    if(wait_for_arp_req(socket_fd, &malcolm) == -1)
+ 
+    if(malcolm.waitArpReq == 0 && wait_for_arp_req(socket_fd, &malcolm) == -1)
     {
         dprintf(2, "Error while waiting for ARP request \n");
         return (1);
     }
+    
+
     printf("Now sending an ARP reply to the target address with spoofed source, please wait...\n");
     do
     {

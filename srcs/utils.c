@@ -178,7 +178,13 @@ int atoi_i (char *str, int *i)
 void error_args(char * progname)
 {
 	printf("-h: Information obout options\n");
+	printf("Do not use the same flag more than once\n");
     printf("Usage: %s <OPTIONS> <SRC_IP> <SRC_MAC> <DEST_IP> <DEST_MAC>\n", progname);
+}
+
+int is_not_flag(char * flag)
+{
+	return (ft_memcmp(flag, "-v", 3) != 0 && ft_memcmp(flag, "-r", 3) != 0 && ft_memcmp(flag, "-f", 3) != 0);
 }
 
 int check_args(int argc, char ** argv, struct ft_malcolm * malcolm)
@@ -186,15 +192,17 @@ int check_args(int argc, char ** argv, struct ft_malcolm * malcolm)
 	malcolm->padding = 0;
 	malcolm->repeate = 0;
 	malcolm->verbose = 0;
+	malcolm->waitArpReq = 0;
 
 	if (argc == 2 && ft_memcmp(argv[1], "-h", 3) == 0)
     {
-        printf("-r: Repeate mode, will send ARP REPONSE every seconde\n");
+		printf("-f: Force mode, dont wait for the arp request to send the arp response.\n");
+        printf("-r: Repeate mode, will send ARP REPONSE every second\n");
         printf("-v: Verbose mode, will print more information about process\n");
         return (1);
     }
 
-    if (argc < 5 || argc > 7) 
+    if (argc < 5 || argc > 8) 
     {
        	error_args(argv[0]);
         return 1;
@@ -202,20 +210,38 @@ int check_args(int argc, char ** argv, struct ft_malcolm * malcolm)
 
     if (argc > 5) 
     {
-        if (ft_memcmp(argv[2], argv[1], 2) == 0 ||  (argc == 7 && ((ft_memcmp(argv[2], "-v", 3) != 0) && ft_memcmp(argv[2], "-r", 3) != 0) || (ft_memcmp(argv[1], "-r", 3) != 0 && ft_memcmp(argv[1], "-v", 3) != 0)))
-        {
-            error_args(argv[0]);
-            return 1;
-        }
-        if ((ft_memcmp(argv[1], "-v", 3) == 0 || ft_memcmp(argv[2], "-v", 3) == 0))
+		if (argc == 7)
+		{
+			if (ft_memcmp(argv[2], argv[1], 2) == 0 || is_not_flag(argv[1]) || is_not_flag(argv[2]))
+			{
+				error_args(argv[0]);
+				return 1;
+			}
+		}
+
+		else if (argc == 8)
+		{
+			if (ft_memcmp(argv[2], argv[1], 2) == 0 || ft_memcmp(argv[1], argv[3], 2) == 0 || ft_memcmp(argv[2], argv[3], 2) == 0 || is_not_flag(argv[1]) || is_not_flag(argv[2]) || is_not_flag(argv[3]))
+			{
+				error_args(argv[0]);
+				return 1;
+			}
+		}
+       
+        if ((ft_memcmp(argv[1], "-v", 3) == 0 || ft_memcmp(argv[2], "-v", 3) == 0) || ft_memcmp(argv[3], "-v", 3) == 0)
         {
             malcolm->padding++;
             malcolm->verbose = 1;
         }
-        if (ft_memcmp(argv[1], "-r", 3) == 0 || ft_memcmp(argv[2], "-r", 3) == 0)
+		if (ft_memcmp(argv[1], "-r", 3) == 0 || ft_memcmp(argv[2], "-r", 3) == 0 || ft_memcmp(argv[3], "-r", 3) == 0)
         {
             malcolm->padding++;
             malcolm->repeate = 1;
+        }
+		if (ft_memcmp(argv[1], "-f", 3) == 0 || ft_memcmp(argv[2], "-f", 3) == 0 || ft_memcmp(argv[3], "-f", 3) == 0)
+        {
+            malcolm->padding++;
+            malcolm->waitArpReq = 1;
         }
         if (malcolm->padding == 0)
         {

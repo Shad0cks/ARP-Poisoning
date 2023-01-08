@@ -41,7 +41,7 @@ struct ft_malcolm
   unsigned char target_mac[MAC_LENGTH];
   unsigned char target_ip[IPV4_LENGTH];
   struct sockaddr_ll * socket_address;
-  int padding, verbose, repeate;
+  int padding, verbose, repeate, waitArpReq;
 };
 
 void            convert_mac(const char * mac_addr,  unsigned char * dest);
