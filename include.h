@@ -52,4 +52,5 @@ int             dns_lookup(char * addr);
 size_t	        ft_strlen(const char *str);
 int             check_mac_format(char *mac);
 int             atoi_i (char *str, int *i);
+int             check_ip_format(char * ip);
 #endif
