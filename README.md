@@ -5,7 +5,7 @@ Use flag -r to repeate the response every second and -v for a verbose mode.
 
 ## Authors
 
-- [@shad0cks](https://www.github.com/shd0cks)
+- [@shad0cks](https://www.github.com/shad0cks)
 
 
 ## Usage
