@@ -189,7 +189,7 @@ int check_args(int argc, char ** argv, struct ft_malcolm * malcolm)
 
 	if (argc == 2 && ft_memcmp(argv[1], "-h", 3) == 0)
     {
-        printf("-r: Repeate mode, will send ARP REPONSE every seconde\n");
+        printf("-r: Repeate mode, will send ARP REPONSE every second\n");
         printf("-v: Verbose mode, will print more information about process\n");
         return (1);
     }
