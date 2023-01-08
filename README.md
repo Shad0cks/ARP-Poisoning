@@ -12,7 +12,7 @@ Use flag -r to repeate the response every second and -v for a verbose mode.
 
 #### Usage :
 
-```http
+```
   make && ./ft_malcolm <OPTIONS> <SRC_IP> <SRC_MAC> <DEST_IP> <DEST_MAC>
 ```
 
