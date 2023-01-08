@@ -8,9 +8,7 @@ Use flag -r to repeate the response every second and -v for a verbose mode.
 - [@shad0cks](https://www.github.com/shd0cks)
 
 
-## API Reference
-
-#### Usage :
+## Usage
 
 ```
   make && ./ft_malcolm <OPTIONS> <SRC_IP> <SRC_MAC> <DEST_IP> <DEST_MAC>
