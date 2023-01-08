@@ -174,3 +174,54 @@ int atoi_i (char *str, int *i)
 	}
 	return (n);
 }
+
+void error_args(char * progname)
+{
+	printf("-h: Information obout options\n");
+    printf("Usage: %s <OPTIONS> <SRC_IP> <SRC_MAC> <DEST_IP> <DEST_MAC>\n", progname);
+}
+
+int check_args(int argc, char ** argv, struct ft_malcolm * malcolm)
+{
+	malcolm->padding = 0;
+	malcolm->repeate = 0;
+	malcolm->verbose = 0;
+
+	if (argc == 2 && ft_memcmp(argv[1], "-h", 3) == 0)
+    {
+        printf("-r: Repeate mode, will send ARP REPONSE every seconde\n");
+        printf("-v: Verbose mode, will print more information about process\n");
+        return (1);
+    }
+
+    if (argc < 5 || argc > 7) 
+    {
+       	error_args(argv[0]);
+        return 1;
+    }
+
+    if (argc > 5) 
+    {
+        if (ft_memcmp(argv[2], argv[1], 2) == 0 ||  (argc == 7 && ((ft_memcmp(argv[2], "-v", 3) != 0) && ft_memcmp(argv[2], "-r", 3) != 0) || (ft_memcmp(argv[1], "-r", 3) != 0 && ft_memcmp(argv[1], "-v", 3) != 0)))
+        {
+            error_args(argv[0]);
+            return 1;
+        }
+        if ((ft_memcmp(argv[1], "-v", 3) == 0 || ft_memcmp(argv[2], "-v", 3) == 0))
+        {
+            malcolm->padding++;
+            malcolm->verbose = 1;
+        }
+        if (ft_memcmp(argv[1], "-r", 3) == 0 || ft_memcmp(argv[2], "-r", 3) == 0)
+        {
+            malcolm->padding++;
+            malcolm->repeate = 1;
+        }
+        if (malcolm->padding == 0)
+        {
+            error_args(argv[0]);
+            return 1;
+        }
+    }
+	return (0);
+}

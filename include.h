@@ -41,6 +41,7 @@ struct ft_malcolm
   unsigned char target_mac[MAC_LENGTH];
   unsigned char target_ip[IPV4_LENGTH];
   struct sockaddr_ll * socket_address;
+  int padding, verbose, repeate;
 };
 
 void            convert_mac(const char * mac_addr,  unsigned char * dest);
@@ -53,4 +54,5 @@ size_t	        ft_strlen(const char *str);
 int             check_mac_format(char *mac);
 int             atoi_i (char *str, int *i);
 int             check_ip_format(char * ip);
+int             check_args(int argc, char ** argv, struct ft_malcolm * malcolm);
 #endif
