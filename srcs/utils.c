@@ -23,8 +23,24 @@ int dns_lookup(char * addr)
 	else
 		dprintf(2, "IP Error : Failed to find %s in the network\n", addr);
 	
-	freeaddrinfo(res);
 	return (-1);
+}
+
+int check_ip_format(char * ip)
+{
+	int i = 0;
+	int j = 0;
+	while (j < 3)
+	{
+		int p = atoi_i(ip, &i);
+		if (p < 0 || p > 255)
+			return (-1);
+		else if (j != 3 && ip[i++] != '.')
+			return (-1);
+		else if (j == 3 && ip[i] != 0)
+			return (-1);
+		j++;
+	}
 }
 
 int check_mac_format(char *mac)
@@ -143,4 +159,18 @@ size_t	ft_strlen(const char *str)
 	while (str[index] != '\0')
 		index++;
 	return (index);
+}
+
+int atoi_i (char *str, int *i)
+{
+	int n = 0;
+
+	if (str[*i] < '0' || str[*i] > '9')
+		return (-1);
+	while (str[*i] >= '0' && str[*i] <= '9')
+	{
+		n = n * 10 + str[*i] - '0';
+		(*i)++;
+	}
+	return (n);
 }

@@ -51,4 +51,5 @@ int             compare_mac(unsigned char * mac1,  unsigned char * mac2);
 int             dns_lookup(char * addr);
 size_t	        ft_strlen(const char *str);
 int             check_mac_format(char *mac);
+int             atoi_i (char *str, int *i);
 #endif

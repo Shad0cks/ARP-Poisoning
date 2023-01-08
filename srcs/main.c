@@ -155,6 +155,12 @@ int main(int argc, char** argv)
         return (1);
     }
 
+    if (check_ip_format(argv[1]) == -1 || check_ip_format(argv[3]) == -1)
+    {
+        dprintf(2, "Wrong ip address format\n");
+        return (1);
+    }
+
     if (dns_lookup(argv[3]) == -1 || dns_lookup(argv[1]) == -1)
         return (1);
 
