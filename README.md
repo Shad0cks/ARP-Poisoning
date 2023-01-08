@@ -14,12 +14,12 @@ Use flag -r to repeate the response every second and -v for a verbose mode.
   make && ./ft_malcolm <OPTIONS> <SRC_IP> <SRC_MAC> <TARGET_IP> <TARGET_MAC>
 ```
 
-| Parameter |  Description                |
-| :-------- |  :------------------------- |
-| `source ip` | **Required**. Gateway IP |
-| `source mac address` | **Required**. Gateway MAC |
-| `target ip` | **Required**. Victim IP |
-| `target mac address` | **Required**. Victim MAC |
+| Parameter | Exemple     | Description                |
+| :-------- | :------- | :------------------------- |
+| `source ip` | `10.2.0.1` | **Required**. Gateway IP |
+| `source mac address` | `aa:aa:aa:aa:aa:aa` | **Required**. Gateway MAC |
+| `target ip` | `10.2.0.12` | **Required**. Victim IP |
+| `target mac address` | `bb:bb:bb:bb:bb:bb` | **Required**. Victim MAC |
 
 
 
