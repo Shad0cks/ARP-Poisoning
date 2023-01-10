@@ -1,7 +1,7 @@
 # ARP Poisoning
 After execution, the program will wait for the target to make an ARP request 
 and instantly respond with the malicious ARP response.\
-Use flag -r to repeate the response every second, -v for a verbose mode and -f to not wait for the arp request from target to send the arp response.
+Use flag -r to repeate the response every second, -v for a verbose mode and -f to not wait for the arp request from target to send the arp response. (42 Project)
 
 ## Authors
 
