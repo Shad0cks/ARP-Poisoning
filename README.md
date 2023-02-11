@@ -11,6 +11,7 @@ Use flag -r to repeate the response every second, -v for a verbose mode and -f t
 ## Usage
 
 ```
+sysctl -w net.ipv4.ip_forward=1 &&
   make && ./ft_malcolm <OPTIONS> <SRC_IP> <SRC_MAC> <TARGET_IP> <TARGET_MAC>
 ```
 
